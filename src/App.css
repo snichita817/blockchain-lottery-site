@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Secular+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Staatliches&display=swap');
 
 .App {
   text-align: center;
@@ -43,16 +43,18 @@
   margin-top: 10px;
   width: 250px;
   height: 100px;
-  background-color: cyan;
-  border-radius: 10px;
-  font-family: 'Secular One', sans-serif;
-  font-weight: 700;
+  background-color: #8A8A8A;
+  opacity: 0.6;
+  border-radius: 4px;
+  font-family: 'Staatliches', cursive;
+  font-weight: 500;
   font-size: 30px;
   border: 2px solid black;
+  transition: 0.3s;
 }
 
 #random:hover{ 
-  background-color: white;
+  opacity: 1;
   animation-name: animatie;
   animation-duration: 2s;
 }

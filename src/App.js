@@ -1,122 +1,40 @@
-import logo from './logo.svg';
+import logo from './ethereum-1.svg';
+import React from 'react';
 import './App.css';
+import {contractID,contractABI} from './variabile.js';
+const { ethers, BigNumber } = require("ethers");
 
 function App() {
 
-  const { ethers } = require("ethers");
-  const contractID = "0x23fd4f984715FdA04d41bAa49743FAD89e4a8088";
-  const contractABI = [
-    {
-      "inputs": [],
-      "name": "enter",
-      "outputs": [],
-      "stateMutability": "payable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "finalizareTombola",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "string",
-          "name": "_nume",
-          "type": "string"
-        }
-      ],
-      "name": "setNume",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "startTombola",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "stateMutability": "nonpayable",
-      "type": "constructor"
-    },
-    {
-      "inputs": [],
-      "name": "withdrawFunds",
-      "outputs": [],
-      "stateMutability": "payable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "getNume",
-      "outputs": [
-        {
-          "internalType": "string",
-          "name": "",
-          "type": "string"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "nume",
-      "outputs": [
-        {
-          "internalType": "string",
-          "name": "",
-          "type": "string"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "name": "players",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    }
-  ];
-
+  const [numberOfPlayers,setNumberOfPlayers] = React.useState(0);
+  const [boolx, setboolx] = React.useState(false);
+  
   async function connect(){
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const numberContract = new ethers.Contract(contractID,contractABI,provider); 
     await provider.send("eth_requestAccounts", []);
     console.log("conectat");
+    const nrOfPlayers = await numberContract.getNumber();
+    console.log(BigNumber.from(nrOfPlayers).toString());
+    setNumberOfPlayers(BigNumber.from(nrOfPlayers).toString());
+    const boolx1 = await numberContract.getStarted();
+    console.log(boolx1);
+    setboolx(boolx1);
   }
 
 
   async function join(){
 
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-    
     const signer = provider.getSigner();
     const numberContract = new ethers.Contract(contractID,contractABI,signer);
     const options = {value: ethers.utils.parseEther("0.1")}
-    //const numeeeee = await numberContract.nume();
-    //console.log(numeeeee);
+    const numeeeee = await numberContract.getStarted();
+    console.log(numeeeee);
     await numberContract.enter(options);
+    const nrOfPlayers = await numberContract.getNumber();
+    console.log(BigNumber.from(nrOfPlayers).toString());
+    setNumberOfPlayers(BigNumber.from(nrOfPlayers).toString());
     // await provider.send("eth_requestAccounts", []);
     // await signer.sendTransaction();
   }
@@ -127,7 +45,6 @@ function App() {
     const signer = provider.getSigner();
     const numberContract = new ethers.Contract(contractID,contractABI,signer); 
  //   await provider.send("eth_requestAccounts", []);
-    console.log("conectat");
     await numberContract.startTombola();
   }
 
@@ -137,19 +54,31 @@ function App() {
     const signer = provider.getSigner();
     const numberContract = new ethers.Contract(contractID,contractABI,signer); 
  //   await provider.send("eth_requestAccounts", []);
-    console.log("conectat");
+    
+    //const numar = await numberContract.getNumber();
+    //console.log(numar);
     await numberContract.finalizareTombola();
   }
 
+  async function withdraw(){
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    const numberContract = new ethers.Contract(contractID,contractABI,signer); 
+    await numberContract.withdrawFunds();
+  }
 
   return (
+
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
+        <p>There are currently {numberOfPlayers} players.</p>
+        <div>The lottery is currently <b> {boolx ? 'STARTED' : 'STOPPED'}</b></div>
         <button type="button" id="random" onClick={connect}>Connect with metamask </button>
         <button type="button" id="random" onClick={join}>Join Lottery </button>
         <button type="button" id="random" onClick={start}>Start Lottery (admin only)</button>
         <button type="button" id="random" onClick={finish}>Pick a winner (admin only)</button>
+        <button type="button" id="random" onClick={withdraw}>Withdraw funds (admin only)</button>
       </header>
     </div>
   );
